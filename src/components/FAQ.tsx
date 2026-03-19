@@ -18,7 +18,7 @@ export default function FAQ() {
    <section id="faq" className="py-24 px-6 md:px-[8vw] bg-[#080808]">
      <div className="max-w-3xl mx-auto">
        <h2 className="font-bebas text-[48px] md:text-[64px] tracking-[2px] leading-none mb-16 text-center">
-         COMMON <span className="text-[#E8000D]">MANIFESTATIONS</span>
+         COMMON <span className="text-[#E8000D]">QUESTIONS</span>
        </h2>
        <div className="space-y-4">
          {FAQ_ITEMS.map((item, i) => (

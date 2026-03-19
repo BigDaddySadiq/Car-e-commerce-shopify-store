@@ -28,9 +28,9 @@ export default function Navbar() {
        className={`fixed top-0 left-0 w-full h-[64px] z-[1000] flex items-center justify-between px-6 md:px-[4vw] transition-all duration-300 ${scrolled ? "bg-[#080808]/80 backdrop-blur-[40px] saturate-[180%] border-b border-white/5" : "bg-transparent"}`}
      >
        <Link href="/" className="group inline-flex flex-col items-start pt-[6px]">
-         <span className="font-bebas text-[18px] tracking-[8px] text-white leading-none uppercase">MANIFEST</span>
+         <span className="font-bebas text-[18px] tracking-[8px] text-white leading-none uppercase">REAL</span>
          <div className="w-full h-[1px] bg-[#E8000D] my-[2px] transition-transform duration-300 group-hover:scale-x-110 origin-left" />
-         <span className="font-bebas text-[18px] tracking-[8px] text-[#E8000D] leading-none uppercase">DRIVES</span>
+         <span className="font-bebas text-[18px] tracking-[8px] text-[#E8000D] leading-none uppercase">DRIVE</span>
        </Link>
        <div className="hidden md:flex gap-8 items-center">
          {links.map((item, i) => (

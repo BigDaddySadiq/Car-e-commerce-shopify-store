@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", weight: ["40
 const bebas = Bebas_Neue({ subsets: ["latin"], weight: "400", variable: "--font-bebas" });
 
 export const metadata: Metadata = {
- title: "Manifest Drives — Own It In Your Hand First",
+ title: "Real Drive — Own It In Your Hand First",
  description: "Premium 1:32 die-cast scale models. Red Tesla Roadster Convertible. Lamborghini Huracán STO. Porsche 911 GT3 RS.",
  icons: {
    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/favicon.ico" }],

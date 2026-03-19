@@ -27,12 +27,12 @@ export default function Policies() {
 
           <section id="terms" className="scroll-mt-32">
             <h2 className="font-bebas text-3xl md:text-4xl text-white tracking-[2px] mb-6 uppercase">Terms of Service</h2>
-            <p className="leading-relaxed">By accessing our website and purchasing our luxury scale models, you agree to be bound by these terms. Manifest Drives reserves the right to update these policies at any time to reflect operational changes.</p>
+            <p className="leading-relaxed">By accessing our website and purchasing our luxury scale models, you agree to be bound by these terms. Real Drive reserves the right to update these policies at any time to reflect operational changes.</p>
           </section>
 
           <section id="contact" className="scroll-mt-32">
             <h2 className="font-bebas text-3xl md:text-4xl text-white tracking-[2px] mb-6 uppercase">Contact</h2>
-            <p className="leading-relaxed">For any inquiries, requests, or post-purchase support, please reach out directly to our concierge team at <a href="mailto:support@manifestdrives.com" className="text-white underline hover:text-[#E8000D] transition-colors">support@manifestdrives.com</a>.</p>
+            <p className="leading-relaxed">For any inquiries, requests, or post-purchase support, please reach out directly to our concierge team at <a href="mailto:support@realdrive.com" className="text-white underline hover:text-[#E8000D] transition-colors">support@realdrive.com</a>.</p>
           </section>
         </div>
       </div>

@@ -8,9 +8,9 @@ export default function Footer() {
         {/* Column 1: Brand Logo & Tagline */}
         <div className="flex flex-col items-start gap-6">
           <Link href="/" className="group inline-flex flex-col items-start">
-            <span className="font-bebas text-[24px] tracking-[10px] text-white leading-none uppercase">MANIFEST</span>
+            <span className="font-bebas text-[24px] tracking-[10px] text-white leading-none uppercase">REAL</span>
             <div className="w-full h-[1px] bg-[#E8000D] my-[4px] transition-transform duration-300 group-hover:scale-x-110 origin-left" />
-            <span className="font-bebas text-[24px] tracking-[10px] text-[#E8000D] leading-none uppercase">DRIVES</span>
+            <span className="font-bebas text-[24px] tracking-[10px] text-[#E8000D] leading-none uppercase">DRIVE</span>
           </Link>
           <div className="font-inter text-[13px] leading-relaxed max-w-[200px]">
             Own It In Your Hand First. Everything else follows.
@@ -44,7 +44,7 @@ export default function Footer() {
 
       {/* Bottom Row */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-[8vw] py-8 border-t border-white/[0.04] flex flex-col md:flex-row justify-between items-center gap-4 font-inter text-[11px] tracking-[2px] uppercase">
-        <div>&copy; {new Date().getFullYear()} MANIFEST DRIVES. ALL RIGHTS RESERVED.</div>
+        <div>&copy; {new Date().getFullYear()} REAL DRIVE. ALL RIGHTS RESERVED.</div>
         <div className="text-white/30">SHIPS WORLDWIDE</div>
       </div>
     </footer>
