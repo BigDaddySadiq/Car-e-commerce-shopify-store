@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const PRODUCTS = [
- { id:"tesla", handle:"tesla-roadster-diecast-model", name:"RED TESLA ROADSTER CONVERTIBLE", specs:"1.9s 0-60 · 250+ MPH", quote:'"The most wanted desk on the way to the most wanted car."', price:"49.99", video:"/assets/product/product-tesla.mp4" },
- { id:"sto", handle:"lamborghini-die-cast-model", name:"HURACÁN STO", specs:"V10 · 640 HP · 3.0s", quote:'"Not a toy. A declaration."', price:"49.99", video:"/assets/product/product-sto.mp4" },
- { id:"gt3", handle:"porsche-gt3-rs-model", name:"PORSCHE 911 GT3 RS", specs:"FLAT-SIX · 525 HP · 9,000 RPM", quote:'"The obsessive\'s anchor."', price:"49.99", video:"/assets/product/product-gt3.mp4" },
+ { id:"tesla", handle:"1-24-r-roadster-high-simulation-diecast-metal-alloy-model-car-sound-light-pull-back-collection-kids-toy-gifts", name:"RED TESLA ROADSTER CONVERTIBLE", specs:"1.9s 0-60 · 250+ MPH", quote:'"The most wanted desk on the way to the most wanted car."', video:"/assets/hero/hero-tesla.mp4" },
+ { id:"sto", handle:"1-18-lamborghini-huracan-sterrato-supercar-alloy-diecast-model-car-home-ornaments-computer-desktop-decoration-simulation-vehicle", name:"HURACÁN STO", specs:"V10 · 640 HP · 3.0s", quote:'"Not a toy. A declaration."', video:"/assets/hero/hero-sto.mp4" },
+ { id:"gt3", handle:"1-36-porsche-911-992-gt3-rs-alloy-track-racing-car-model-diecast-metal-sports-car-vehicles-model-simulation-collection-kids-gift", name:"PORSCHE 911 GT3 RS", specs:"FLAT-SIX · 525 HP · 9,000 RPM", quote:'"The obsessive\'s anchor."', video:"/assets/hero/hero-porsche.mp4" },
 ];
 
 export default function Collection() {
@@ -35,20 +35,24 @@ export default function Collection() {
              <div className="font-bebas text-[28px] tracking-[2px] text-white mb-2">{prod.name}</div>
              <div className="font-inter text-[12px] tracking-[2px] text-[#9A9A9A] uppercase mb-4">{prod.specs}</div>
              <div className="font-inter text-[14px] italic text-[#6A6A6A] leading-relaxed mb-6">{prod.quote}</div>
-             <div className="mt-auto pt-6 border-t border-[rgba(255,255,255,0.04)]">
-               <div className="text-center font-inter text-[16px] font-bold text-[#C9A84C] mb-4">${prod.price}</div>
-               {mounted ? (
-                 // @ts-expect-error custom element
-                 <shopify-context type="product" handle={prod.handle}>
-                   <template dangerouslySetInnerHTML={{ __html: `
-                     <div style="text-align:center;font-size:16px;font-weight:700;color:#C9A84C;margin-bottom:12px;">$${prod.price}</div>
-                     <button onclick="document.getElementById('cart').addLine(event).showModal();" style="width:100%;background:#E8000D;color:white;border:none;padding:15px 0;font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:pointer;">Add to Cart</button>
-                   ` }} />
-                 </shopify-context>
-               ) : (
-                 <button className="w-full bg-[#E8000D] text-white border-none py-3 font-inter text-[11px] tracking-[3px] uppercase font-bold">Add to Cart</button>
-               )}
-             </div>
+              <div className="mt-auto pt-6 border-t border-[rgba(255,255,255,0.04)] w-full flex flex-col items-center">
+                {mounted ? (
+                  // @ts-ignore custom element
+                  <shopify-context type="product" handle={prod.handle}>
+                    <template dangerouslySetInnerHTML={{ __html: `
+                      <div class="flex flex-col items-center w-full gap-3 mt-1">
+                        <div class="font-bebas text-2xl text-white tracking-[2px]"><shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money></div>
+                        <button class="w-full bg-[#E8000D] hover:bg-white hover:text-black transition-colors duration-300 text-white font-bebas text-lg px-6 py-4 uppercase tracking-[3px] shadow-[0_0_20px_rgba(232,0,13,0.3)] mb-2" onclick="document.getElementById('cart').addLine(event); document.getElementById('cart').showModal();">Claim Yours</button>
+                      </div>
+                    ` }} />
+                  </shopify-context>
+                ) : (
+                  <div className="flex flex-col items-center w-full gap-3 mt-1 opacity-0">
+                    <div className="font-bebas text-2xl text-transparent tracking-[2px]">$0.00</div>
+                    <button className="w-full bg-[#E8000D] text-transparent font-bebas text-lg px-6 py-4 uppercase tracking-[3px] pointer-events-none mb-2">Claim Yours</button>
+                  </div>
+                )}
+              </div>
            </div>
          </motion.div>
        ))}

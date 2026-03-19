@@ -5,9 +5,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Updated from BMW to Tesla per user instructions
 const CARS = [
- { id:"tesla", handle:"tesla-roadster", tab:"TESLA ROADSTER", headline:"THE FIRST STEP.", subline:"Every man who owns the real car started somewhere.", price:"49.99", video:"/assets/hero/hero-tesla.mp4", videoPosition:"center center" },
- { id:"sto", handle:"huracan-sto", tab:"HURACÁN STO", headline:"THE DREAM IS REAL.", subline:"Keep it where you can see it. Every morning.", price:"49.99", video:"/assets/hero/hero-sto.mp4", videoPosition:"center center" },
- { id:"gt3", handle:"porsche-911-gt3-rs", tab:"PORSCHE GT3 RS", headline:"BUILT FOR THOSE WHO KNOW.", subline:"The men who own these cars once held one like this.", price:"49.99", video:"/assets/hero/hero-gt3.mp4", videoPosition:"65% center" },
+ { id:"tesla", handle:"1-24-r-roadster-high-simulation-diecast-metal-alloy-model-car-sound-light-pull-back-collection-kids-toy-gifts", tab:"TESLA ROADSTER", headline:"THE FIRST STEP.", subline:"Every man who owns the real car started somewhere.", video:"/assets/hero/hero-tesla.mp4", videoPosition:"center center" },
+ { id:"sto", handle:"1-18-lamborghini-huracan-sterrato-supercar-alloy-diecast-model-car-home-ornaments-computer-desktop-decoration-simulation-vehicle", tab:"HURACÁN STO", headline:"THE DREAM IS REAL.", subline:"Keep it where you can see it. Every morning.", video:"/assets/hero/hero-sto.mp4", videoPosition:"center center" },
+ { id:"gt3", handle:"1-36-porsche-911-992-gt3-rs-alloy-track-racing-car-model-diecast-metal-sports-car-vehicles-model-simulation-collection-kids-gift", tab:"PORSCHE GT3 RS", headline:"BUILT FOR THOSE WHO KNOW.", subline:"The men who own these cars once held one like this.", video:"/assets/hero/hero-gt3.mp4", videoPosition:"65% center" },
 ];
 
 export default function Hero() {
@@ -44,14 +44,20 @@ export default function Hero() {
          <motion.div key={car.id} initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:20 }} transition={{ duration:0.5, ease:[0.25,0.46,0.45,0.94] }}>
            <h1 className="font-bebas text-[clamp(64px,10vw,120px)] text-white leading-[0.87] mb-6 uppercase">{car.headline}</h1>
            <p className="font-inter text-[16px] text-[#9A9A9A] max-w-[360px] leading-relaxed mb-10">{car.subline}</p>
-           {mounted ? (
-             // @ts-expect-error custom element
-             <shopify-context type="product" handle={car.handle}>
-               <template dangerouslySetInnerHTML={{ __html: `<button onclick="document.getElementById('cart').addLine(event).showModal();" class="inline-block font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-white bg-[#E8000D] btn-premium">CLAIM YOURS — $${car.price}</button>` }} />
-             </shopify-context>
-           ) : (
-             <button className="inline-block font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-white bg-[#E8000D]">CLAIM YOURS — $${car.price}</button>
-           )}
+            {mounted ? (
+              // @ts-ignore custom element
+              <shopify-context type="product" handle={car.handle}>
+                <template dangerouslySetInnerHTML={{ __html: `
+                  <button class="inline-flex items-center gap-4 font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-white bg-[#E8000D] transition-all hover:bg-white hover:text-black" onclick="document.getElementById('cart').addLine(event); document.getElementById('cart').showModal();">
+                    <span>CLAIM YOURS</span>
+                    <span class="w-[1px] h-3 bg-current opacity-50"></span>
+                    <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
+                  </button>
+                ` }} />
+              </shopify-context>
+            ) : (
+              <button className="inline-flex items-center gap-4 font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-transparent bg-[#E8000D] pointer-events-none">CLAIM YOURS</button>
+            )}
          </motion.div>
        </AnimatePresence>
      </div>
