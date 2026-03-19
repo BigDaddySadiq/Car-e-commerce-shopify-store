@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const PRODUCTS = [
  { id:"tesla", handle:"1-24-r-roadster-high-simulation-diecast-metal-alloy-model-car-sound-light-pull-back-collection-kids-toy-gifts", name:"RED TESLA ROADSTER CONVERTIBLE", specs:"1.9s 0-60 · 250+ MPH", quote:'"The most wanted desk on the way to the most wanted car."', video:"/assets/hero/hero-tesla.mp4" },
  { id:"sto", handle:"1-18-lamborghini-huracan-sterrato-supercar-alloy-diecast-model-car-home-ornaments-computer-desktop-decoration-simulation-vehicle", name:"HURACÁN STO", specs:"V10 · 640 HP · 3.0s", quote:'"Not a toy. A declaration."', video:"/assets/hero/hero-sto.mp4" },
- { id:"gt3", handle:"1-36-porsche-911-992-gt3-rs-alloy-track-racing-car-model-diecast-metal-sports-car-vehicles-model-simulation-collection-kids-gift", name:"PORSCHE 911 GT3 RS", specs:"FLAT-SIX · 525 HP · 9,000 RPM", quote:'"The obsessive\'s anchor."', video:"/assets/hero/hero-porsche.mp4" },
+ { id:"gt3", handle:"1-36-porsche-911-992-gt3-rs-alloy-track-racing-car-model-diecast-metal-sports-car-vehicles-model-simulation-collection-kids-gift", name:"PORSCHE 911 GT3 RS", specs:"FLAT-SIX · 525 HP · 9,000 RPM", quote:'"The obsessive\'s anchor."', video:"/assets/hero/hero-gt3.mp4" },
 ];
 
 export default function Collection() {
