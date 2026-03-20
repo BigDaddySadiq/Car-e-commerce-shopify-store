@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 
 const MANIFESTO_LINES = [
   "You do not settle.",
@@ -9,6 +10,8 @@ const MANIFESTO_LINES = [
 ];
 
 export default function SwipeManifesto() {
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   return (
     <section className="bg-[#0F0F0F] flex flex-col md:flex-row overflow-hidden border-b border-white/[0.04]">
       {/* Left Content */}
@@ -55,32 +58,34 @@ export default function SwipeManifesto() {
       </div>
 
       {/* Right Content - Drag Carousel */}
-      <div className="w-full md:w-1/2 bg-black h-[400px] md:h-auto min-h-[500px] relative overflow-hidden flex items-center justify-center border-l border-white/[0.04]">
+      <div ref={carouselRef} className="w-full md:w-1/2 bg-black h-[400px] md:h-auto min-h-[500px] relative overflow-hidden flex items-center justify-start border-l border-white/[0.04] py-8 pl-8 md:pl-12 pr-0">
         <motion.div 
-          className="flex cursor-grab active:cursor-grabbing gap-4 px-12 items-center"
+          className="flex cursor-grab active:cursor-grabbing gap-6 items-center"
           drag="x"
-          dragConstraints={{ left: -1000, right: 0 }}
-          dragElastic={0.2}
-          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+          dragConstraints={carouselRef}
+          dragElastic={0.1}
+          dragTransition={{ bounceStiffness: 400, bounceDamping: 35 }}
           whileTap={{ cursor: "grabbing" }}
         >
-          {/* Images created by combining generated images to showcase the lifestyle nature of the brand */}
-          {[1, 2, 3, 4].map((i) => (
+          {/* Images representing the 3 cars */}
+          {[1, 2, 3].map((i) => (
             <motion.div
               key={i}
-              className="min-w-[300px] md:min-w-[400px] aspect-[4/5] bg-[#1A1A1A] overflow-hidden pointer-events-none border border-white/5 shadow-2xl"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.4 }}
+              className="w-[280px] md:w-[380px] aspect-[4/5] flex-shrink-0 bg-[#0A0A0A] overflow-hidden pointer-events-none border border-white/5 shadow-2xl relative group"
+              whileHover={{ scale: 1.015 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              {/* Note: The Drag carousel will use our generated testimonial images as lifestyle shots */}
-              <img src={`/us-t${i}.jpg`} alt="Lifestyle" className="w-full h-full object-cover opacity-80" draggable="false" />
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+              <img src={`/us-t${i}.jpg`} alt="Lifestyle" className="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" draggable="false" />
             </motion.div>
           ))}
+          {/* Invisible spacer right pad to maintain visual margin against the border when dragged all the way */}
+          <div className="w-[8px] md:w-[12px] flex-shrink-0" />
         </motion.div>
         
         {/* Swipe instruction overlay */}
-        <div className="absolute bottom-8 right-8 pointer-events-none font-inter text-[11px] tracking-[4px] text-white/50 bg-black/40 backdrop-blur-md px-4 py-2 border border-white/10 rounded-full flex gap-2 items-center uppercase">
-          <span>&larr;</span> Drag to view
+        <div className="absolute bottom-6 md:bottom-10 right-6 md:right-10 z-20 pointer-events-none font-inter text-[11px] tracking-[4px] text-white/50 bg-black/60 backdrop-blur-lg px-5 py-3 border border-white/10 rounded-full flex gap-3 items-center uppercase shadow-2xl">
+          <span className="animate-pulse">&larr;&rarr;</span> Drag to view
         </div>
       </div>
     </section>
