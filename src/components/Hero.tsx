@@ -44,20 +44,18 @@ export default function Hero() {
          <motion.div key={car.id} initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:20 }} transition={{ duration:0.5, ease:[0.25,0.46,0.45,0.94] }}>
            <h1 className="font-bebas text-[clamp(64px,10vw,120px)] text-white leading-[0.87] mb-6 uppercase">{car.headline}</h1>
            <p className="font-inter text-[16px] text-[#9A9A9A] max-w-[360px] leading-relaxed mb-10">{car.subline}</p>
-            {mounted ? (
-              // @ts-ignore custom element
-              <shopify-context type="product" handle={car.handle}>
-                <template dangerouslySetInnerHTML={{ __html: `
-                  <button class="inline-flex items-center gap-4 font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-white bg-[#E8000D] transition-all hover:bg-white hover:text-black" onclick="document.getElementById('cart').addLine(event); document.getElementById('cart').showModal();">
-                    <span>CLAIM YOURS</span>
-                    <span class="w-[1px] h-3 bg-current opacity-50"></span>
-                    <shopify-money query="product.selectedOrFirstAvailableVariant.price"></shopify-money>
-                  </button>
-                ` }} />
-              </shopify-context>
-            ) : (
-              <button className="inline-flex items-center gap-4 font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-transparent bg-[#E8000D] pointer-events-none">CLAIM YOURS</button>
-            )}
+             {mounted ? (
+               // @ts-ignore custom element
+               <shopify-context type="product" handle={car.handle}>
+                 <template dangerouslySetInnerHTML={{ __html: `
+                   <button class="inline-flex items-center justify-center font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-white bg-[#E8000D] transition-all hover:bg-white hover:text-black" onclick="document.getElementById('cart').addLine(event); document.getElementById('cart').showModal();">
+                     <span>CLAIM YOURS</span>
+                   </button>
+                 ` }} />
+               </shopify-context>
+             ) : (
+               <button className="inline-flex items-center justify-center font-bebas text-[16px] tracking-[4px] px-10 py-4 uppercase text-transparent bg-[#E8000D] pointer-events-none">CLAIM YOURS</button>
+             )}
          </motion.div>
        </AnimatePresence>
      </div>
