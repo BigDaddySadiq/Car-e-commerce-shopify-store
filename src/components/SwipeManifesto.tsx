@@ -6,23 +6,36 @@ export default function SwipeManifesto() {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    setSliderPosition((x / rect.width) * 100);
-  };
+  const rectRef = useRef<DOMRect | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(true);
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    rectRef.current = containerRef.current.getBoundingClientRect();
+    const rect = rectRef.current;
+    
+    // Optional pointer capture allows dragging even if mouse exits the bounding box
+    e.currentTarget.setPointerCapture(e.pointerId);
+
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     setSliderPosition((x / rect.width) * 100);
   };
 
-  const handlePointerUp = () => setIsDragging(false);
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging || !rectRef.current) return;
+    const rect = rectRef.current;
+    
+    // Utilize rAF to ensure style transitions don't block the JS main thread on extreme mouse movement
+    window.requestAnimationFrame(() => {
+      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      setSliderPosition((x / rect.width) * 100);
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDragging(false);
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  };
 
   return (
     <section className="bg-[#0F0F0F] flex flex-col md:flex-row overflow-hidden border-b border-white/[0.04]">
@@ -64,11 +77,14 @@ export default function SwipeManifesto() {
         onPointerLeave={handlePointerUp}
       >
         {/* Base Layer: TOMORROW IN YOUR DRIVEWAY (Right side) */}
-        <div className="absolute inset-0 z-10">
-          <img src="https://manifestdrives.shop/assets/swipe/car-driveway.png" alt="Tomorrow in your driveway" className="w-full h-full object-cover pointer-events-none" draggable="false" />
-          <div className="absolute bottom-6 md:bottom-12 right-6 md:right-12 text-right">
-            <div className="font-inter text-[10px] tracking-[4px] text-[#E8000D] uppercase mb-1">TOMORROW</div>
-            <div className="font-bebas text-[24px] md:text-[36px] text-white tracking-[2px] leading-none drop-shadow-xl">IN YOUR DRIVEWAY</div>
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <img src="https://manifestdrives.shop/assets/swipe/car-driveway.png" alt="Tomorrow in your driveway" className="w-full h-full object-cover" draggable="false" />
+          {/* Subtle gradient overlay to dramatically boost the text contrast against the bright driveway */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          
+          <div className="absolute bottom-6 md:bottom-12 right-6 md:right-12 text-right z-10">
+            <div className="font-inter font-semibold text-[11px] tracking-[4px] text-[#E8000D] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">TOMORROW</div>
+            <div className="font-bebas text-[24px] md:text-[36px] text-white tracking-[2px] leading-none drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">IN YOUR DRIVEWAY</div>
           </div>
         </div>
 
@@ -77,10 +93,12 @@ export default function SwipeManifesto() {
           className="absolute inset-0 z-20 pointer-events-none"
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         >
-          <img src="https://manifestdrives.shop/assets/swipe/car-desk.png" alt="Today on your desk" className="w-full h-full object-cover pointer-events-none" draggable="false" />
-          <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12">
-            <div className="font-inter text-[10px] tracking-[4px] text-[#E8000D] uppercase mb-1 drop-shadow-xl">TODAY</div>
-            <div className="font-bebas text-[24px] md:text-[36px] text-white tracking-[2px] leading-none drop-shadow-xl">ON YOUR DESK</div>
+          <img src="https://manifestdrives.shop/assets/swipe/car-desk.png" alt="Today on your desk" className="w-full h-full object-cover" draggable="false" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          
+          <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12 z-10">
+            <div className="font-inter font-semibold text-[11px] tracking-[4px] text-[#E8000D] uppercase mb-1 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">TODAY</div>
+            <div className="font-bebas text-[24px] md:text-[36px] text-white tracking-[2px] leading-none drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">ON YOUR DESK</div>
           </div>
         </div>
 
@@ -89,13 +107,21 @@ export default function SwipeManifesto() {
           className="absolute top-0 bottom-0 z-30 w-[2px] bg-[#E8000D] pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(232,0,13,0.5)]"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="w-[42px] h-[42px] rounded-full bg-black/90 backdrop-blur-md border border-[#E8000D] flex items-center justify-center text-[#E8000D] shadow-[0_0_20px_rgba(232,0,13,0.8)] absolute -translate-x-[20px]">
-            <span className="text-[10px] tracking-[1px] transform scale-150">&larr;&rarr;</span>
+          {/* Recreated circular icon with specific separated arrows */}
+          <div className="w-[48px] h-[48px] rounded-full bg-[#0A0A0A] border-[1.5px] border-[#E8000D] flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.8)] absolute -translate-x-[24px]">
+            <div className="flex items-center gap-[6px]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8000D" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8000D" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
         </div>
 
         {/* Floating DRAG hint */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none font-inter text-[10px] tracking-[4px] text-white/50 uppercase flex items-center gap-2">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none font-inter font-bold text-[10px] tracking-[4px] text-white/50 uppercase flex items-center gap-2 drop-shadow-md">
           &larr; DRAG &rarr;
         </div>
       </div>
