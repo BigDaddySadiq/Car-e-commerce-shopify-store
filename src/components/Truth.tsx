@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function Truth() {
  return (
-   <section id="the-proof" className="bg-[#080808] px-6 py-[80px] md:px-[8vw] md:py-[120px] flex flex-col md:flex-row gap-10 md:gap-[8vw]">
+   <section id="the-proof" className="bg-[#080808] overflow-x-clip px-6 py-[80px] md:px-[8vw] md:py-[120px] flex flex-col md:flex-row gap-10 md:gap-[8vw]">
      <motion.div initial={{opacity:0,x:-40}} whileInView={{opacity:1,x:0}} viewport={{once:true,margin:"-20%"}} transition={{duration:0.8}} className="flex-1">
        <div className="font-inter text-[11px] tracking-[5px] text-[#E8000D] uppercase mb-8">WHY EVERY MAN DREAMS OF A CAR</div>
        <h2 className="font-bebas text-[44px] md:text-[72px] text-white leading-[0.92] mb-8">MOST MEN<br />DREAM.<br />SCROLL.<br />FORGET.</h2>

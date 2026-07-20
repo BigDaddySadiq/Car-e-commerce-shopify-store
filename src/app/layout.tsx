@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  return (
    <html lang="en">
      <head>
-       <script type="module" src="https://cdn.shopify.com/storefront/web-components.js" async />
+       <link rel="preload" as="image" href="/assets/hero/hero-tesla.webp" fetchPriority="high" />
      </head>
      <body className={`${inter.variable} ${bebas.variable} antialiased bg-[#080808] text-white`}>
        <CustomCursor />

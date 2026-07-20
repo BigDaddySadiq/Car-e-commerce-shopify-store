@@ -24,6 +24,12 @@ body {
  -webkit-font-smoothing: antialiased;
 }
 
+shopify-store { display: contents; }
+
+@media (pointer: coarse) {
+ body, button, a { cursor: auto; }
+}
+
 /* Global grain texture */
 body::before {
  content: "";

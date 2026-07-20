@@ -1,22 +1,62 @@
 "use client";
-import { useEffect, useState } from "react";
+import Script from "next/script";
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  SHOPIFY_STORE_DOMAIN,
+  SHOPIFY_STOREFRONT_TOKEN,
+} from "@/lib/shopify";
+
+type ShopifyStatus = "checking" | "ready" | "unavailable";
+
+const ShopifyStatusContext = createContext<ShopifyStatus>("checking");
+
+export function useShopifyStatus() {
+  return useContext(ShopifyStatusContext);
+}
 
 export default function ShopifyProvider({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [status, setStatus] = useState<ShopifyStatus>("checking");
+
+  useEffect(() => {
+    let active = true;
+
+    const checkStore = async () => {
+      try {
+        const response = await fetch("/api/shopify/health", {
+          cache: "no-store",
+        });
+        const data = await response.json();
+        if (active) setStatus(data.available ? "ready" : "unavailable");
+      } catch {
+        if (active) setStatus("unavailable");
+      }
+    };
+
+    void checkStore();
+    const recoveryCheck = window.setInterval(checkStore, 60_000);
+
+    return () => {
+      active = false;
+      window.clearInterval(recoveryCheck);
+    };
+  }, []);
 
   return (
-    <>
-      {mounted ? (
-        // @ts-ignore
-        <shopify-store store-domain="https://reel-to-real-2.myshopify.com" public-access-token="c2d5c118eaba70c09bf70f2303c0105d">
-          {children}
-          {/* @ts-ignore */}
-          <shopify-cart id="cart" />
-        </shopify-store>
-      ) : (
-        <div className="opacity-0">{children}</div>
+    <ShopifyStatusContext.Provider value={status}>
+      {status === "ready" && (
+        <Script
+          type="module"
+          src="https://cdn.shopify.com/storefront/web-components.js"
+          strategy="afterInteractive"
+        />
       )}
-    </>
+      <shopify-store
+        store-domain={SHOPIFY_STORE_DOMAIN}
+        public-access-token={SHOPIFY_STOREFRONT_TOKEN}
+      >
+        {children}
+        {status === "ready" && <shopify-cart id="cart" />}
+      </shopify-store>
+    </ShopifyStatusContext.Provider>
   );
 }
