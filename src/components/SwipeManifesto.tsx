@@ -1,46 +1,112 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";
+import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 export default function SwipeManifesto() {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const rectRef = useRef<DOMRect | null>(null);
+  const pointerIdRef = useRef<number | null>(null);
+  const positionRef = useRef(50);
+  const pendingClientXRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    if (!containerRef.current) return;
-    rectRef.current = containerRef.current.getBoundingClientRect();
-    const rect = rectRef.current;
-    
-    // Optional pointer capture allows dragging even if mouse exits the bounding box
-    e.currentTarget.setPointerCapture(e.pointerId);
+  const applyPosition = (position: number, width?: number) => {
+    const container = containerRef.current;
+    if (!container) return;
 
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    setSliderPosition((x / rect.width) * 100);
+    const safePosition = Math.max(0, Math.min(position, 100));
+    const containerWidth = width ?? container.getBoundingClientRect().width;
+    positionRef.current = safePosition;
+    container.style.setProperty(
+      "--slider-x",
+      `${(safePosition / 100) * containerWidth}px`,
+    );
+    container.setAttribute("aria-valuenow", String(Math.round(safePosition)));
   };
 
-  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging || !rectRef.current) return;
-    const rect = rectRef.current;
-    
-    // Utilize rAF to ensure style transitions don't block the JS main thread on extreme mouse movement
-    window.requestAnimationFrame(() => {
-      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-      setSliderPosition((x / rect.width) * 100);
+  const schedulePointerUpdate = (clientX: number) => {
+    pendingClientXRef.current = clientX;
+    if (animationFrameRef.current !== null) return;
+
+    animationFrameRef.current = window.requestAnimationFrame(() => {
+      animationFrameRef.current = null;
+      const rect = rectRef.current;
+      const pendingClientX = pendingClientXRef.current;
+      if (!rect || pendingClientX === null || rect.width === 0) return;
+
+      const x = Math.max(0, Math.min(pendingClientX - rect.left, rect.width));
+      applyPosition((x / rect.width) * 100, rect.width);
     });
   };
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(false);
-    e.currentTarget.releasePointerCapture(e.pointerId);
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      const rect = container.getBoundingClientRect();
+      rectRef.current = rect;
+      applyPosition(positionRef.current, rect.width);
+    });
+
+    resizeObserver.observe(container);
+    return () => {
+      resizeObserver.disconnect();
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!e.isPrimary || e.button !== 0) return;
+    pointerIdRef.current = e.pointerId;
+    rectRef.current = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.dataset.dragging = "true";
+    e.currentTarget.setPointerCapture(e.pointerId);
+    schedulePointerUpdate(e.clientX);
+  };
+
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== e.pointerId) return;
+    const coalescedEvents = e.nativeEvent.getCoalescedEvents?.();
+    const latestEvent = coalescedEvents?.[coalescedEvents.length - 1];
+    schedulePointerUpdate(latestEvent?.clientX ?? e.clientX);
+  };
+
+  const finishDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current !== e.pointerId) return;
+    pointerIdRef.current = null;
+    e.currentTarget.dataset.dragging = "false";
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  const handleLostPointerCapture = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pointerIdRef.current === e.pointerId) pointerIdRef.current = null;
+    e.currentTarget.dataset.dragging = "false";
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const largeStep = e.shiftKey ? 10 : 2;
+    let nextPosition = positionRef.current;
+
+    if (e.key === "ArrowLeft") nextPosition -= largeStep;
+    else if (e.key === "ArrowRight") nextPosition += largeStep;
+    else if (e.key === "Home") nextPosition = 0;
+    else if (e.key === "End") nextPosition = 100;
+    else return;
+
+    e.preventDefault();
+    applyPosition(nextPosition);
   };
 
   return (
     <section className="bg-[#0F0F0F] flex flex-col md:flex-row overflow-hidden border-b border-white/[0.04]">
       {/* Left Content */}
-      <div className="w-full md:w-1/2 p-10 md:p-[8vw] flex flex-col justify-center">
+      <div className="w-full md:w-1/2 px-6 py-16 sm:p-10 md:p-[8vw] flex flex-col justify-center">
         <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.6}} className="font-inter text-[11px] tracking-[5px] text-[#E8000D] uppercase mb-10">
           WHY THIS EXISTS
         </motion.div>
@@ -55,7 +121,7 @@ export default function SwipeManifesto() {
           <p className="mb-2">He found it. Saved it. Forgot it.</p>
           <p className="mb-8">The dream faded because nothing kept it alive.</p>
           
-          <p className="text-white font-bold text-[20px] md:text-[24px] mb-8">That can't happen to yours.</p>
+          <p className="text-white font-bold text-[20px] md:text-[24px] mb-8">That can&apos;t happen to yours.</p>
           
           <p className="mb-2">Keep it on your desk.</p>
           <p className="mb-2">Keep it in your line of sight.</p>
@@ -70,15 +136,24 @@ export default function SwipeManifesto() {
       {/* Right Content - Before/After Slider */}
       <div 
         ref={containerRef}
-        className="w-full md:w-1/2 bg-[#0A0A0A] h-[450px] md:h-auto md:min-h-[700px] relative overflow-hidden select-none cursor-ew-resize border-l border-white/[0.04]"
+        role="slider"
+        tabIndex={0}
+        aria-label="Compare the model car on a desk with the real car in a driveway"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={50}
+        data-dragging="false"
+        className="swipe-slider w-full md:w-1/2 bg-[#0A0A0A] h-[clamp(450px,122vw,540px)] md:h-auto md:min-h-[700px] relative overflow-hidden select-none cursor-ew-resize border-y md:border-y-0 md:border-l border-white/[0.06] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E8000D]"
         onPointerMove={handleMove}
         onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
+        onLostPointerCapture={handleLostPointerCapture}
+        onKeyDown={handleKeyDown}
       >
         {/* Base Layer: TOMORROW IN YOUR DRIVEWAY (Right side) */}
         <div className="absolute inset-0 z-10 pointer-events-none">
-          <img src="https://manifestdrives.shop/assets/swipe/car-driveway.png" alt="Tomorrow in your driveway" className="w-full h-full object-cover" draggable="false" />
+          <Image src="/assets/swipe/car-driveway.webp" alt="Tomorrow in your driveway" fill sizes="(max-width: 767px) 100vw, 50vw" quality={85} className="object-cover" draggable={false} />
           {/* Subtle gradient overlay to dramatically boost the text contrast against the bright driveway */}
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           
@@ -90,10 +165,9 @@ export default function SwipeManifesto() {
 
         {/* Top Layer: TODAY ON YOUR DESK (Left side) */}
         <div 
-          className="absolute inset-0 z-20 pointer-events-none"
-          style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+          className="swipe-reveal absolute inset-0 z-20 pointer-events-none"
         >
-          <img src="https://manifestdrives.shop/assets/swipe/car-desk.png" alt="Today on your desk" className="w-full h-full object-cover" draggable="false" />
+          <Image src="/assets/swipe/car-desk.webp" alt="Today on your desk" fill sizes="(max-width: 767px) 100vw, 50vw" quality={85} className="object-cover" draggable={false} />
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           
           <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12 z-10">
@@ -104,11 +178,10 @@ export default function SwipeManifesto() {
 
         {/* Draggable Handle Line */}
         <div 
-          className="absolute top-0 bottom-0 z-30 w-[2px] bg-[#E8000D] pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(232,0,13,0.5)]"
-          style={{ left: `${sliderPosition}%` }}
+          className="swipe-divider absolute top-0 bottom-0 z-30 w-[2px] bg-[#E8000D] pointer-events-none flex items-center justify-center shadow-[0_0_20px_rgba(232,0,13,0.5)]"
         >
           {/* Recreated circular icon with specific separated arrows */}
-          <div className="w-[48px] h-[48px] rounded-full bg-[#0A0A0A] border-[1.5px] border-[#E8000D] flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.8)] absolute -translate-x-[24px]">
+          <div className="swipe-handle w-[52px] h-[52px] rounded-full bg-[#0A0A0A]/95 border-[1.5px] border-[#E8000D] flex items-center justify-center shadow-[0_4px_24px_rgba(0,0,0,0.85)] absolute left-1/2 backdrop-blur-sm">
             <div className="flex items-center gap-[6px]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8000D" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -121,7 +194,7 @@ export default function SwipeManifesto() {
         </div>
 
         {/* Floating DRAG hint */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none font-inter font-bold text-[10px] tracking-[4px] text-white/50 uppercase flex items-center gap-2 drop-shadow-md">
+        <div className="absolute bottom-5 md:bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none font-inter font-bold text-[10px] tracking-[4px] text-white/60 uppercase flex items-center gap-2 drop-shadow-md whitespace-nowrap">
           &larr; DRAG &rarr;
         </div>
       </div>

@@ -26,6 +26,36 @@ body {
 
 shopify-store { display: contents; }
 
+.swipe-slider {
+ --slider-x: 50%;
+ touch-action: pan-y;
+ overscroll-behavior-inline: contain;
+ contain: layout paint style;
+ -webkit-tap-highlight-color: transparent;
+}
+
+.swipe-reveal {
+ clip-path: inset(0 calc(100% - var(--slider-x)) 0 0);
+ will-change: clip-path;
+ transform: translateZ(0);
+}
+
+.swipe-divider {
+ left: var(--slider-x);
+ will-change: left;
+ transform: translateZ(0);
+}
+
+.swipe-handle {
+ transform: translateX(-50%) scale(1);
+ transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.swipe-slider[data-dragging="true"] .swipe-handle {
+ transform: translateX(-50%) scale(1.08);
+ box-shadow: 0 6px 30px rgba(232, 0, 13, 0.28);
+}
+
 @media (pointer: coarse) {
  body, button, a { cursor: auto; }
 }
